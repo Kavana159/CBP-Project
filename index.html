@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Flow - Premium Study Planner</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark-mode">
+
+    <!-- Auth Overlay (Firebase) -->
+    <div class="auth-overlay active" id="auth-overlay">
+        <div class="auth-modal glass-card">
+            <div class="logo justify-center">
+                <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h1>Focus Flow</h1>
+            </div>
+
+            <form id="login-form" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="login-name" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Log In</button>
+                <div class="auth-links">
+                    <a href="#" id="show-signup">Create Account</a>
+                    <a href="#" id="show-forgot">Forgot Password?</a>
+                </div>
+            </form>
+
+            <form id="signup-form" class="auth-form">
+                <h2>Create Account</h2>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="signup-name" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Sign Up</button>
+                <div class="auth-links">
+                    <a href="#" id="show-login">Already have an account? Log In</a>
+                </div>
+            </form>
+
+            <form id="forgot-form" class="auth-form">
+                <h2>Reset Password</h2>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="forgot-email" required>
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Send Reset Link</button>
+                <div class="auth-links">
+                    <a href="#" id="show-login-from-forgot">Back to Log In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h1>Focus Flow</h1>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-tab="dashboard"><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li data-tab="tasks"><a href="#"><i class="fa-solid fa-list-check"></i> Tasks</a></li>
+                <li data-tab="pomodoro"><a href="#"><i class="fa-solid fa-stopwatch"></i> Pomodoro</a></li>
+                <li data-tab="calendar"><a href="#"><i class="fa-solid fa-calendar-days"></i> Calendar</a></li>
+                <li data-tab="analytics"><a href="#"><i class="fa-solid fa-chart-pie"></i> Analytics</a></li>
+                <li data-tab="notes"><a href="#"><i class="fa-solid fa-book"></i> Notes</a></li>
+                <li data-tab="settings"><a href="#"><i class="fa-solid fa-gear"></i> Settings</a></li>
+
+                <li class="user-profile-item" style="margin-top: auto; margin-bottom: 0.5rem;">
+                    <div class="user-profile"
+                        style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(148, 163, 184, 0.05); border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1);">
+                        <div class="user-avatar" id="sidebar-user-icon"
+                            style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;">
+                            U</div>
+                        <div class="user-name" id="sidebar-user-name"
+                            style="font-weight: 500; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                            User</div>
+                    </div>
+                </li>
+
+                <li class="logout-item"><a href="#" id="nav-logout"><i class="fa-solid fa-right-from-bracket"></i>
+                        Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="greeting">
+                    <h2 id="greeting-text">Good Morning, Student</h2>
+                    <p id="date-display">Monday, October 10</p>
+                </div>
+                <div class="header-actions">
+                    <div class="user-profile-header"
+                        style="display: flex; align-items: center; gap: 0.5rem; background: rgba(148, 163, 184, 0.1); padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid rgba(148, 163, 184, 0.2); margin-right: 0.5rem;">
+                        <div id="header-user-icon"
+                            style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
+                            S</div>
+                        <span id="header-user-name" style="font-weight: 500; font-size: 0.95rem;">Student</span>
+                    </div>
+                    <button class="btn secondary-btn" id="theme-toggle"><i class="fa-solid fa-moon"></i></button>
+                    <button class="btn primary-btn" id="add-task-btn"><i class="fa-solid fa-plus"></i> New Task</button>
+                </div>
+            </header>
+
+            <!-- TABS CONTAINER -->
+            <div class="tabs-container">
+
+                <!-- DASHBOARD TAB -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <section class="overview-cards">
+                        <div class="card glass-card">
+                            <div class="card-icon blue"><i class="fa-solid fa-clipboard-list"></i></div>
+                            <div class="card-info">
+                                <h3>Total Tasks</h3>
+                                <p class="stat" id="stat-total">0</p>
+                            </div>
+                        </div>
+                        <div class="card glass-card">
+                            <div class="card-icon green"><i class="fa-solid fa-check-circle"></i></div>
+                            <div class="card-info">
+                                <h3>Completed</h3>
+                                <p class="stat" id="stat-completed">0</p>
+                            </div>
+                        </div>
+                        <div class="card glass-card">
+                            <div class="card-icon orange"><i class="fa-solid fa-fire"></i></div>
+                            <div class="card-info">
+                                <h3>Focus Hours</h3>
+                                <p class="stat" id="stat-focus">0h 0m</p>
+                            </div>
+                        </div>
+                        <div class="card glass-card">
+                            <div class="card-icon purple"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="card-info">
+                                <h3>Productivity</h3>
+                                <p class="stat" id="stat-score">0%</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="dashboard-grid">
+                        <section class="ai-recommendations glass-card">
+                            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Recommendations</h3>
+                            <ul class="ai-list" id="ai-recs">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </section>
+                        <section class="mini-pomodoro glass-card">
+                            <h3>Current Session</h3>
+                            <div class="mini-timer" id="mini-timer-display">25:00</div>
+                            <button class="btn primary-btn full-width"
+                                onclick="document.querySelector('[data-tab=\'pomodoro\']').click()">Open Timer</button>
+                        </section>
+                    </div>
+
+                    <section class="dashboard-recent-tasks glass-card" style="padding: 1.5rem; margin-top: 2rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3><i class="fa-solid fa-list-check"></i> Pending Tasks</h3>
+                            <button class="btn secondary-btn"
+                                onclick="document.querySelector('[data-tab=\'tasks\']').click()"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">View All</button>
+                        </div>
+                        <div class="task-list" id="dashboard-task-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TASKS TAB -->
+                <div id="tab-tasks" class="tab-content">
+                    <div class="section-header">
+                        <h3>Task Management</h3>
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="completed">Done</button>
+                        </div>
+                    </div>
+                    <div class="task-list" id="task-list">
+                        <!-- Draggable Tasks -->
+                    </div>
+                </div>
+
+                <!-- POMODORO TAB -->
+                <div id="tab-pomodoro" class="tab-content">
+                    <div class="pomodoro-wrapper glass-card">
+                        <div class="mode-selector">
+                            <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
+                            <button class="mode-btn" data-mode="shortBreak">Short Break</button>
+                            <button class="mode-btn" data-mode="longBreak">Long Break</button>
+                        </div>
+                        <div class="timer-display">
+                            <svg class="progress-ring" width="300" height="300">
+                                <circle class="progress-ring__circle" stroke="rgba(255,255,255,0.1)" stroke-width="12"
+                                    fill="transparent" r="135" cx="150" cy="150" />
+                                <circle class="progress-ring__circle active-ring" stroke="var(--primary)"
+                                    stroke-width="12" fill="transparent" r="135" cx="150" cy="150" />
+                            </svg>
+                            <div class="time-left" id="time-left">25:00</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn primary-btn timer-btn" id="start-timer">Start</button>
+                            <button class="btn secondary-btn timer-btn" id="reset-timer"><i
+                                    class="fa-solid fa-rotate-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALENDAR TAB -->
+                <div id="tab-calendar" class="tab-content">
+                    <div class="calendar-wrapper glass-card">
+                        <div class="calendar-header">
+                            <button class="btn secondary-btn" id="prev-month">&lt;</button>
+                            <h3 id="month-year-display">October 2026</h3>
+                            <button class="btn secondary-btn" id="next-month">&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid">
+                            <!-- JS injected days -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+                <div id="tab-analytics" class="tab-content">
+                    <div class="analytics-grid">
+                        <div class="chart-container glass-card">
+                            <h3>Weekly Focus Hours</h3>
+                            <canvas id="focusChart"></canvas>
+                        </div>
+                        <div class="chart-container glass-card">
+                            <h3>Subject Breakdown</h3>
+                            <canvas id="subjectChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTES TAB -->
+                <div id="tab-notes" class="tab-content">
+                    <div class="section-header">
+                        <h3>Study Notes</h3>
+                        <button class="btn primary-btn" id="add-note-btn"><i class="fa-solid fa-plus"></i> New
+                            Note</button>
+                    </div>
+                    <div class="notes-grid" id="notes-grid">
+                        <!-- Notes injected by JS -->
+                    </div>
+                </div>
+
+                <!-- SETTINGS TAB -->
+                <div id="tab-settings" class="tab-content">
+                    <div class="settings-wrapper glass-card">
+                        <h3>Settings</h3>
+                        <div class="setting-item">
+                            <span>Dark Mode</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-theme" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>Sound Alerts</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-sound" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>Alarm Ringtone</span>
+                            <select id="setting-alarm-tone"
+                                style="background: rgba(148, 163, 184, 0.1); color: var(--text-main); border: 1px solid rgba(148, 163, 184, 0.2); padding: 0.4rem 0.8rem; border-radius: 8px; font-family: inherit; cursor: pointer; outline: none;">
+                                <option value="chime">Gentle Chime</option>
+                                <option value="digital">Digital Beep</option>
+                                <option value="bell">Classic Bell</option>
+                                <option value="synth">Synth Alert</option>
+                                <option value="retro">Retro Alert</option>
+                                <option value="marimba">Soft Marimba</option>
+                                <option value="harp">Gentle Harp</option>
+                                <option value="gong">Deep Gong</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Task Modal -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2>Add New Task</h2>
+                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="task-subject" list="subject-options" required
+                            placeholder="Type or select...">
+                        <datalist id="subject-options">
+                            <option value="Mathematics"></option>
+                            <option value="Science"></option>
+                            <option value="History"></option>
+                            <option value="Literature"></option>
+                            <option value="Other"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="task-date" required>
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Save Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="modal-overlay" id="note-modal">
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2>Add Note</h2>
+                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="note-form">
+                <input type="hidden" id="note-id">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="note-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="note-content" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Save Note</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action successful!</div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
